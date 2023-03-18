@@ -14,9 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My App',
       home: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('SafeMap'),
-        // ),
         body: MapScreen(),
       ),
     );
@@ -39,7 +36,6 @@ class _MapScreenState extends State<MapScreen> {
       heading: 0.0,
       speed: 0.0,
       speedAccuracy: 0.0);
-  // Position(longitude: 12.9716, latitude: 77.5946)
 
   bool _isReportButtonPressed = false;
 
@@ -66,6 +62,13 @@ class _MapScreenState extends State<MapScreen> {
         18.0,
       );
     }
+  }
+
+  void _onReportButtonPressed(bool isPressed) {
+    setState(() {
+      _isReportButtonPressed = isPressed;
+    });
+    print(_isReportButtonPressed);
   }
 
   @override
@@ -116,19 +119,15 @@ class _MapScreenState extends State<MapScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
-              child: ReportButton(),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+            child: ReportButton(
+              onPressed: (isPressed) => _onReportButtonPressed(isPressed),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-              onPressed: _centerMap,
-              child: Icon(Icons.my_location),
-            ),
+          FloatingActionButton(
+            onPressed: _centerMap,
+            child: Icon(Icons.my_location),
           ),
         ],
       ),
@@ -138,7 +137,9 @@ class _MapScreenState extends State<MapScreen> {
 }
 
 class ReportButton extends StatefulWidget {
-  const ReportButton({Key? key}) : super(key: key);
+  final ValueChanged<bool>? onPressed;
+
+  const ReportButton({Key? key, this.onPressed}) : super(key: key);
 
   @override
   _ReportButtonState createState() => _ReportButtonState();
@@ -157,6 +158,9 @@ class _ReportButtonState extends State<ReportButton> {
           setState(() {
             _isButtonPressed = !_isButtonPressed;
           });
+          if (widget.onPressed != null) {
+            widget.onPressed!(_isButtonPressed);
+          }
         },
         child: Icon(Icons.report),
       ),
