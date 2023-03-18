@@ -68,7 +68,14 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _isReportButtonPressed = isPressed;
     });
-    print(_isReportButtonPressed);
+
+    if (_isReportButtonPressed) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Report mode is ON. Tap on map to register a crime'),
+        duration: Duration(seconds: 5),
+        backgroundColor: Colors.red,
+      ));
+    }
   }
 
   @override
