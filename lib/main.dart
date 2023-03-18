@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:safemap/utils/getLiveLocation.dart';
@@ -15,9 +14,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My App',
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('SafeMap'),
-        ),
+        // appBar: AppBar(
+        //   title: Text('SafeMap'),
+        // ),
         body: MapScreen(),
       ),
     );
@@ -41,6 +40,8 @@ class _MapScreenState extends State<MapScreen> {
       speed: 0.0,
       speedAccuracy: 0.0);
   // Position(longitude: 12.9716, latitude: 77.5946)
+
+  bool _isReportButtonPressed = false;
 
   @override
   void initState() {
@@ -79,7 +80,8 @@ class _MapScreenState extends State<MapScreen> {
                     _currentPosition!.longitude,
                   ),
                   zoom: 18.0,
-                  maxZoom: 18.2),
+                  maxZoom: 18.2,
+                  minZoom: 12.0),
               children: [
                 TileLayer(
                   urlTemplate:
@@ -110,11 +112,54 @@ class _MapScreenState extends State<MapScreen> {
           : Center(
               child: CircularProgressIndicator(),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _centerMap,
-        child: Icon(Icons.my_location),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+              child: ReportButton(),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: FloatingActionButton(
+              onPressed: _centerMap,
+              child: Icon(Icons.my_location),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
+
+class ReportButton extends StatefulWidget {
+  const ReportButton({Key? key}) : super(key: key);
+
+  @override
+  _ReportButtonState createState() => _ReportButtonState();
+}
+
+class _ReportButtonState extends State<ReportButton> {
+  bool _isButtonPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16, left: 16),
+      child: FloatingActionButton(
+        backgroundColor: _isButtonPressed ? Colors.red : Colors.grey,
+        onPressed: () {
+          setState(() {
+            _isButtonPressed = !_isButtonPressed;
+          });
+        },
+        child: Icon(Icons.report),
+      ),
     );
   }
 }
