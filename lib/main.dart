@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:safemap/utils/getLiveLocation.dart';
@@ -43,6 +44,7 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _mapController = MapController();
+    // _mapTileController = MapTileLayerController();
     determinePosition().then((position) {
       setState(() {
         _currentPosition = position;
@@ -91,7 +93,11 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   zoom: 18.0,
                   maxZoom: 18.2,
-                  minZoom: 12.0),
+                  minZoom: 12.0,
+                  // onTap: _handleTap,
+                  onTap: _isReportButtonPressed
+                      ? ((tapPosition, point) => {print(point.toString())})
+                      : null),
               children: [
                 TileLayer(
                   urlTemplate:
@@ -152,8 +158,26 @@ class ReportButton extends StatefulWidget {
   _ReportButtonState createState() => _ReportButtonState();
 }
 
+class _LocationReporter {
+  Future<Position> reportLocation(LatLng tappedPosition) async {
+    final currentPosition = Position(
+      latitude: tappedPosition.latitude,
+      longitude: tappedPosition.longitude,
+      timestamp: DateTime.now(),
+      altitude: 0.0,
+      accuracy: 0.0,
+      heading: 0.0,
+      speed: 0.0,
+      speedAccuracy: 0.0,
+    );
+    return currentPosition;
+  }
+}
+
 class _ReportButtonState extends State<ReportButton> {
   bool _isButtonPressed = false;
+  LatLng? _lastTappedPosition;
+  final MapController _mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +185,7 @@ class _ReportButtonState extends State<ReportButton> {
       margin: EdgeInsets.only(bottom: 16, left: 16),
       child: FloatingActionButton(
         backgroundColor: _isButtonPressed ? Colors.red : Colors.grey,
-        onPressed: () {
+        onPressed: () async {
           setState(() {
             _isButtonPressed = !_isButtonPressed;
           });
